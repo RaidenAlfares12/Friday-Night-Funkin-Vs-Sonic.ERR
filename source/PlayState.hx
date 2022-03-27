@@ -901,6 +901,14 @@ class PlayState extends MusicBeatState
 		add(iconP2);
 		reloadHealthBarColors();
 
+         var creditTxt:FlxText = new FlxText(4,healthBarBG.y + 20,0,("Port by Raiden Alfares"), 24);
+        creditTxt.scrollFactor.set();
+        creditTxt.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+        creditTxt.borderColor = FlxColor.BLACK;
+        creditTxt.borderSize = 20;
+        creditTxt.borderStyle = FlxTextBorderStyle.OUTLINE;
+        add(creditTxt);
+
 		scoreTxt = new FlxText(0, healthBarBG.y + 36, FlxG.width, "", 20);
 		scoreTxt.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
@@ -942,6 +950,7 @@ class PlayState extends MusicBeatState
 					controls.setHitBoxNOTES(mcontrols._hitbox);
 				default:
 			}
+
 			trackedinputsNOTES = controls.trackedinputsNOTES;
 			controls.trackedinputsNOTES = [];
 
@@ -953,9 +962,10 @@ class PlayState extends MusicBeatState
 			mcontrols.visible = false;
 
 			add(mcontrols);
-     
-      if (curSong == 'No Salvation') {
-		  addVirtualPad(NONE, A);
+			
+			if (curSong == 'No Salvation') {
+		        addVirtualPad(NONE, D);
+			}
 			
 		#end		
 
@@ -1124,36 +1134,30 @@ class PlayState extends MusicBeatState
 
 	public function startVideo(name:String):Void {
 		var foundFile:Bool = false;
-		var fileName:String = Paths.video(name);
-
-		if(OpenFlAssets.exists(fileName)) 
+		var fileName = name;
+		if(OpenFlAssets.exists("assets/videos/" + fileName + ".webm")) 
 		{
 			foundFile = true;
 		}
 
-		if(foundFile) {
-			inCutscene = true;
-			var bg = new FlxSprite(-FlxG.width, -FlxG.height).makeGraphic(FlxG.width * 3, FlxG.height * 3, FlxColor.BLACK);
-			bg.scrollFactor.set();
-			bg.cameras = [camHUD];
-			add(bg);
-
-			(new FlxVideo(fileName)).finishCallback = function() {
-				remove(bg);
-                                if(endingSong) 
-			        {
-				        endSong();
-			        } 
-			        else 
-			        {
-				        startCountdown();
-			        }
-			}
-			return;
-		}
-		else
+		if(foundFile) 
 		{
-			FlxG.log.warn('Couldnt find video file: ' + fileName);
+            var video = new WebmPlayerS(fileName, true);
+            video.endcallback = () -> {
+                remove(video);
+                if(endingSong) {
+                    endSong();
+                } else {
+                    startCountdown();
+                }
+            }
+            video.setGraphicSize(FlxG.width);
+            video.updateHitbox();
+            add(video);
+            video.play();
+		} 
+		else 
+		{
 			if(endingSong) 
 			{
 				endSong();
