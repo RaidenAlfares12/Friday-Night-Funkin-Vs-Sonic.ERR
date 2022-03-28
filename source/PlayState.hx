@@ -1142,7 +1142,7 @@ class PlayState extends MusicBeatState
 
 		if(foundFile) 
 		{
-            var video = new Webview(fileName, true);
+            var video = new WebPlayerView(fileName, true);
             video.endcallback = () -> {
                 remove(video);
                 if(endingSong) {
